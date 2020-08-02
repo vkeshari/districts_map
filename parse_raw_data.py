@@ -1,5 +1,23 @@
 from get_basemap import get_basemap_and_district_info
 
+def parse_district_info(districts_info, out_filename):
+  district_info_file = open(out_filename, 'w')
+  district_info_file.write('district_id,' +
+                           'name,state_id,state' + '\n')
+  
+  districts = set()
+  for d in districts_info:
+    dist_id = d['censuscode']
+    if dist_id == 0:
+      continue
+
+    if dist_id not in districts:
+      district_info_file.write(str(dist_id) + ',' +
+                               str(d['DISTRICT']) + ',' + str(d['ST_CEN_CD']) + ',' + str(d['ST_NM']) + '\n')
+    districts.add(dist_id)
+
+  district_info_file.close()
+
 def parse_population_data(district_keys, out_filename):
   # Population Data
   population_raw_file = open('data/raw_data/district_populations.csv', 'r')
@@ -38,6 +56,9 @@ def parse_population_data(district_keys, out_filename):
 
   populations_file.close()
 
-_, districts = get_basemap_and_district_info(show_background_map = False)
-parse_population_data(districts.keys(), 'data/populations.csv')
+m, districts = get_basemap_and_district_info(show_background_map = False)
+
+# parse_district_info(m.districts_info, out_filename = 'data/districts.csv')
+
+# parse_population_data(districts.keys(), out_filename = 'data/populations.csv')
 
