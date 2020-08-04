@@ -1,25 +1,47 @@
 def get_populations():
   populations = {}
 
-  pop_file = open('data/populations.csv', 'r')
-  for l in pop_file.readlines()[1:]:
+  pop_file = open('data/populations.csv', 'r').readlines()
+  labels = pop_file[0].split(',')
+  for l in pop_file[1:]:
     parts = l.split(',')
 
     dist_id = eval(parts[0])
     populations[dist_id] = {}
 
-    populations[dist_id]['population'] = eval(parts[1])
-    populations[dist_id]['males'] = eval(parts[2])
-    populations[dist_id]['females'] = eval(parts[3])
-    populations[dist_id]['literates'] = eval(parts[4])
-    populations[dist_id]['literate_males'] = eval(parts[5])
-    populations[dist_id]['literate_females'] = eval(parts[6])
-    populations[dist_id]['working'] = eval(parts[7])
-    populations[dist_id]['working_males'] = eval(parts[8])
-    populations[dist_id]['working_females'] = eval(parts[9])
-    populations[dist_id]['non_working'] = eval(parts[10])
-    populations[dist_id]['non_working_males'] = eval(parts[11])
-    populations[dist_id]['non_working_females'] = eval(parts[12])
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+      populations[dist_id][l] = eval(parts[i])
 
   return populations
 
+def get_age_groups():
+  age_groups = {}
+
+  age_group_file = open('data/age_groups.csv', 'r').readlines()
+  labels = age_group_file[0].split(',')
+  for l in age_group_file[1:]:
+    parts = l.split(',')
+
+    dist_id = eval(parts[0])
+    age_groups[dist_id] = {}
+
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+
+      label_parts = l.split('_')
+      group = label_parts[0]
+      age_str = label_parts[1]
+      if age_str == 'none':
+        age = -1
+      else:
+        age = eval(age_str)
+
+      if age not in age_groups[dist_id]:
+        age_groups[dist_id][age] = {}
+      age_groups[dist_id][age][group] = eval(parts[i])
+
+  return age_groups
+ 
