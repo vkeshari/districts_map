@@ -4,7 +4,7 @@ from matplotlib.collections import PatchCollection
 from matplotlib import cm
 
 from get_basemap import get_basemap_and_district_info
-from build_data import get_populations, get_age_groups
+from build_data import get_populations, get_age_groups, get_religions
 
 import numpy as np
 
@@ -28,13 +28,14 @@ def show_map(map_ax, map_data, cmap, title):
   map_ax.add_collection(PatchCollection(map_shapes, edgecolor='white', linewidths=0, facecolors = map_colors, zorder=2))
 
 # Plots
-fig = plt.figure(figsize=(19.2, 10.8), tight_layout=True)
+fig = plt.figure(figsize=(10.8, 10.8), tight_layout=True)
 
 populations = get_populations()
 age_groups = get_age_groups()
+religions = get_religions()
 
 # Literacy
-map_ax = fig.add_subplot(121)
+map_ax = fig.add_subplot(221)
 cmap = cm.get_cmap('YlGn')
 
 map_data = {}
@@ -45,7 +46,7 @@ map_data = normalize_range(map_data)
 show_map(map_ax, map_data, cmap, "Districts of India by Literacy Rate")
 
 # 0-5 population
-map_ax = fig.add_subplot(122)
+map_ax = fig.add_subplot(222)
 cmap = cm.get_cmap('PuBu')
 
 map_data = {}
@@ -54,6 +55,28 @@ for d in populations:
 map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by % population < 5 years old")
+
+# Hindu population
+map_ax = fig.add_subplot(223)
+cmap = cm.get_cmap('OrRd')
+
+map_data = {}
+for d in populations:
+  map_data[d] = religions[d]['hindu'] / populations[d]['population']
+map_data = normalize_range(map_data)
+
+show_map(map_ax, map_data, cmap, "Districts of India by % Hindu population")
+
+# Muslim / Hindu ratio
+map_ax = fig.add_subplot(224)
+cmap = cm.get_cmap('RdPu')
+
+map_data = {}
+for d in populations:
+  map_data[d] = religions[d]['muslim'] / populations[d]['population']
+map_data = normalize_range(map_data)
+
+show_map(map_ax, map_data, cmap, "Districts of India by % Muslim population")
 
 plt.show()
 

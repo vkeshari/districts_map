@@ -2,9 +2,9 @@ def get_populations():
   populations = {}
 
   pop_file = open('data/populations.csv', 'r').readlines()
-  labels = pop_file[0].split(',')
+  labels = pop_file[0].strip().split(',')
   for l in pop_file[1:]:
-    parts = l.split(',')
+    parts = l.strip().split(',')
 
     dist_id = eval(parts[0])
     populations[dist_id] = {}
@@ -20,9 +20,9 @@ def get_age_groups():
   age_groups = {}
 
   age_group_file = open('data/age_groups.csv', 'r').readlines()
-  labels = age_group_file[0].split(',')
+  labels = age_group_file[0].strip().split(',')
   for l in age_group_file[1:]:
-    parts = l.split(',')
+    parts = l.strip().split(',')
 
     dist_id = eval(parts[0])
     age_groups[dist_id] = {}
@@ -44,4 +44,23 @@ def get_age_groups():
       age_groups[dist_id][age][group] = eval(parts[i])
 
   return age_groups
+
+def get_religions():
+  religions = {}
+
+  religions_file = open('data/religions.csv', 'r').readlines()
+  labels = religions_file[0].strip().split(',')
+  for l in religions_file[1:]:
+    parts = l.strip().split(',')
+
+    dist_id = eval(parts[0])
+    religions[dist_id] = {}
+
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+
+      religions[dist_id][l] = eval(parts[i])
+
+  return religions
  

@@ -34,7 +34,6 @@ def parse_district_id(raw_string):
     return eval(dist_id_string)
 
 def parse_population_data(district_keys, out_filename):
-  # Population Data
   population_raw_file = open('data/raw_data/district_populations.csv', 'r')
 
   populations_file = open(out_filename, 'w')
@@ -62,7 +61,7 @@ def parse_population_data(district_keys, out_filename):
   population_raw_file.close()
   populations_file.close()
 
-  check_districts_equal(district_keys, all_district_ids)
+  check_districts_equal(district_keys, all_district_ids, 'populations')
 
 def parse_age_data(district_keys, out_filename):
   age_data = {}
@@ -119,11 +118,59 @@ def parse_age_data(district_keys, out_filename):
       data_line += str(age_data[d][100][p]) + ','
     ages_file.write(data_line[:-1] + '\n')
 
+  check_districts_equal(district_keys, age_data.keys(), 'age_groups')
+
   ages_file.close()
+
+def parse_religion_data(district_keys, out_filename):
+  religion_file = open(out_filename, 'w')
+  religion_file.write('district_id,hindu,muslim,christian,sikh,buddhist,jain,other,none' + '\n')
+
+  all_district_ids = set()
+  files = os.listdir('data/raw_data/religion')
+  for f in files:
+    print (f)
+    sheet = xlrd.open_workbook('data/raw_data/religion/' + f).sheet_by_index(0)
+    
+    for row in range(5, sheet.nrows):
+      dist_id = parse_district_id(sheet.cell_value(row, 2))
+      if dist_id == 0:
+        continue
+      if dist_id not in all_district_ids:
+        all_district_ids.add(dist_id)
+
+      tripura_dist_ids = range(289, 293)
+
+      district_str = sheet.cell_value(row, 5).strip()
+      region_str = sheet.cell_value(row, 6).strip()
+      if (not region_str == 'Total' or
+          dist_id in tripura_dist_ids and
+            (district_str.startswith('State') or
+             district_str.startswith('Sub-District') or
+             district_str.endswith(')') or
+             district_str == 'Area not under any Sub-district') or
+          dist_id not in tripura_dist_ids and
+            not district_str.split('-')[0].strip() == 'District'):
+        continue
+
+      religion_file.write(str(dist_id) + ',' +
+                          str(int(sheet.cell_value(row, 10))) + ',' +
+                          str(int(sheet.cell_value(row, 13))) + ',' +
+                          str(int(sheet.cell_value(row, 16))) + ',' +
+                          str(int(sheet.cell_value(row, 19))) + ',' +
+                          str(int(sheet.cell_value(row, 22))) + ',' +
+                          str(int(sheet.cell_value(row, 25))) + ',' +
+                          str(int(sheet.cell_value(row, 28))) + ',' +
+                          str(int(sheet.cell_value(row, 31))) + '\n')
+
+  check_districts_equal(district_keys, all_district_ids, 'religions')
+
+  religion_file.close()
 
 m, districts = get_basemap_and_district_info(show_background_map = False)
 
 # parse_district_info(m.districts_info, out_filename = 'data/districts.csv')
 # parse_population_data(districts.keys(), out_filename = 'data/populations.csv')
 # parse_age_data(districts.keys(), out_filename = 'data/age_groups.csv')
+# parse_religion_data(districts.keys(), out_filename = 'data/religions.csv')
 
