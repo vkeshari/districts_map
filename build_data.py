@@ -64,3 +64,22 @@ def get_religions():
 
   return religions
  
+def get_education():
+  education = {}
+
+  education_file = open('data/education.csv', 'r').readlines()
+  labels = education_file[0].strip().split(',')
+  for l in education_file[1:]:
+    parts = l.strip().split(',')
+
+    dist_id = eval(parts[0])
+    education[dist_id] = {}
+
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+
+      education[dist_id][l] = eval(parts[i])
+
+  return education
+

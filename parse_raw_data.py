@@ -167,10 +167,52 @@ def parse_religion_data(district_keys, out_filename):
 
   religion_file.close()
 
+def parse_education_data(district_keys, out_filename):
+  education_file = open(out_filename, 'w')
+  education_file.write('district_id,illiterate,only_literate,below_primary,primary,middle,secondary,' +
+                       'intermediate,non_tech_diploma,tech_diploma,graduate,unknown' + '\n')
+
+  all_district_ids = set()
+  files = os.listdir('data/raw_data/education')
+  for f in files:
+    print (f)
+    sheet = xlrd.open_workbook('data/raw_data/education/' + f).sheet_by_index(0)
+    
+    for row in range(5, sheet.nrows):
+      dist_id = parse_district_id(sheet.cell_value(row, 2))
+      if dist_id == 0:
+        continue
+      if dist_id not in all_district_ids:
+        all_district_ids.add(dist_id)
+
+      region_str = sheet.cell_value(row, 4).strip()
+      age_str = str(sheet.cell_value(row, 5)).strip()
+      if (not region_str == 'Total' or
+          not age_str == 'All ages'):
+        continue
+
+      education_file.write(str(dist_id) + ',' +
+                           str(int(sheet.cell_value(row, 9))) + ',' +
+                           str(int(sheet.cell_value(row, 15))) + ',' +
+                           str(int(sheet.cell_value(row, 18))) + ',' +
+                           str(int(sheet.cell_value(row, 21))) + ',' +
+                           str(int(sheet.cell_value(row, 24))) + ',' +
+                           str(int(sheet.cell_value(row, 27))) + ',' +
+                           str(int(sheet.cell_value(row, 30))) + ',' +
+                           str(int(sheet.cell_value(row, 33))) + ',' +
+                           str(int(sheet.cell_value(row, 36))) + ',' +
+                           str(int(sheet.cell_value(row, 39))) + ',' +
+                           str(int(sheet.cell_value(row, 42))) + '\n')
+
+  check_districts_equal(district_keys, all_district_ids, 'education')
+
+  education_file.close()
+
 m, districts = get_basemap_and_district_info(show_background_map = False)
 
 # parse_district_info(m.districts_info, out_filename = 'data/districts.csv')
 # parse_population_data(districts.keys(), out_filename = 'data/populations.csv')
 # parse_age_data(districts.keys(), out_filename = 'data/age_groups.csv')
 # parse_religion_data(districts.keys(), out_filename = 'data/religions.csv')
+# parse_education_data(districts.keys(), out_filename = 'data/education.csv')
 

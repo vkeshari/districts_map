@@ -4,7 +4,7 @@ from matplotlib.collections import PatchCollection
 from matplotlib import cm
 
 from get_basemap import get_basemap_and_district_info
-from build_data import get_populations, get_age_groups, get_religions
+from build_data import get_populations, get_age_groups, get_religions, get_education
 
 import numpy as np
 
@@ -33,6 +33,7 @@ fig = plt.figure(figsize=(10.8, 10.8), tight_layout=True)
 populations = get_populations()
 age_groups = get_age_groups()
 religions = get_religions()
+education = get_education()
 
 # Literacy
 map_ax = fig.add_subplot(221)
@@ -67,16 +68,21 @@ map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by % Hindu population")
 
-# Muslim / Hindu ratio
+# Graduates
 map_ax = fig.add_subplot(224)
 cmap = cm.get_cmap('RdPu')
 
 map_data = {}
 for d in populations:
-  map_data[d] = religions[d]['muslim'] / populations[d]['population']
+  twenty_plus_pop = 0
+  for age in age_groups[d]:
+    if age < 20:
+      continue
+    twenty_plus_pop += age_groups[d][age]['total']
+  map_data[d] = education[d]['graduate'] / twenty_plus_pop
 map_data = normalize_range(map_data)
 
-show_map(map_ax, map_data, cmap, "Districts of India by % Muslim population")
+show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults")
 
 plt.show()
 
