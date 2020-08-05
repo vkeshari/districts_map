@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 from build_data import get_populations, get_age_groups, get_religions, get_education
-from draw_districts import normalize_range, show_map
+from draw_districts import show_map
 
 import numpy as np
 
@@ -21,7 +21,6 @@ cmap = cm.get_cmap('YlGn')
 map_data = {}
 for d in populations:
   map_data[d] = populations[d]['literates'] / populations[d]['population']
-map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by Literacy Rate")
 
@@ -32,7 +31,6 @@ cmap = cm.get_cmap('PuBu')
 map_data = {}
 for d in populations:
   map_data[d] = age_groups[d][0]['total'] / populations[d]['population']
-map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by % population < 5 years old")
 
@@ -43,7 +41,6 @@ cmap = cm.get_cmap('OrRd')
 map_data = {}
 for d in populations:
   map_data[d] = religions[d]['hindu'] / populations[d]['population']
-map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by % Hindu population")
 
@@ -59,7 +56,6 @@ for d in populations:
       continue
     twenty_plus_pop += age_groups[d][age]['total']
   map_data[d] = education[d]['graduate'] / twenty_plus_pop
-map_data = normalize_range(map_data)
 
 show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults")
 
