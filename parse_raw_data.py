@@ -242,7 +242,7 @@ def parse_language_data(district_keys, out_filename):
     heading += l + ','
   languages_file.write(heading[:-1] + '\n')
 
-  for d in languages:
+  for d in sorted(languages.keys()):
     dist_line = str(d) + ','
     for l in sorted(all_languages):
       if l in languages[d]:
