@@ -83,3 +83,22 @@ def get_education():
 
   return education
 
+def get_languages():
+  languages = {}
+
+  languages_file = open('data/languages.csv', 'r').readlines()
+  labels = languages_file[0].strip().split(',')
+  for l in languages_file[1:]:
+    parts = l.strip().split(',')
+
+    dist_id = eval(parts[0])
+    languages[dist_id] = {}
+
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+
+      languages[dist_id][l] = eval(parts[i])
+
+  return languages
+

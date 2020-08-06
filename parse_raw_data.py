@@ -208,6 +208,54 @@ def parse_education_data(district_keys, out_filename):
 
   education_file.close()
 
+def parse_language_data(district_keys, out_filename):
+  languages = {}
+
+  all_languages = set()
+  files = os.listdir('data/raw_data/language')
+  for f in files:
+    print (f)
+    sheet = xlrd.open_workbook('data/raw_data/language/' + f).sheet_by_index(0)
+    
+    for row in range(5, sheet.nrows):
+      dist_id = parse_district_id(sheet.cell_value(row, 2))
+      if dist_id == 0:
+        continue
+      if dist_id not in languages:
+        languages[dist_id] = {}
+      
+      language_str = sheet.cell_value(row, 6)
+      parts = language_str.strip().split(' ')
+      if not len(parts) == 2 or not parts[0].isnumeric() or not parts[1].isalpha() or parts[1] == 'Others':
+        continue
+
+      lang = parts[1].lower().split('/')[0].strip()
+      if not lang in all_languages:
+        all_languages.add(lang)
+      if not lang in languages[dist_id]:
+        languages[dist_id][lang] = 0
+      languages[dist_id][lang] += int(sheet.cell_value(row, 7))
+
+  languages_file = open(out_filename, 'w')
+  heading = 'district_id,'
+  for l in sorted(all_languages):
+    heading += l + ','
+  languages_file.write(heading[:-1] + '\n')
+
+  for d in languages:
+    dist_line = str(d) + ','
+    for l in sorted(all_languages):
+      if l in languages[d]:
+        dist_line += str(languages[d][l]/2) + ','
+      else:
+        dist_line += '0,'
+    languages_file.write(dist_line[:-1] + '\n')
+
+  check_districts_equal(district_keys, languages.keys(), label = 'languages')
+
+  languages_file.close()
+  
+
 m, districts = get_basemap_and_district_info(show_background_map = False)
 
 # parse_district_info(m.districts_info, out_filename = 'data/districts.csv')
@@ -215,4 +263,5 @@ m, districts = get_basemap_and_district_info(show_background_map = False)
 # parse_age_data(districts.keys(), out_filename = 'data/age_groups.csv')
 # parse_religion_data(districts.keys(), out_filename = 'data/religions.csv')
 # parse_education_data(districts.keys(), out_filename = 'data/education.csv')
+# parse_language_data(districts.keys(), out_filename = 'data/languages.csv')
 
