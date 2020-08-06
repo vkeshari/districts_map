@@ -38,7 +38,7 @@ show_map(map_ax, map_data, cmap, "Districts of India by % population < 5 years o
 # {Religion} population
 religion = 'hindu'
 map_ax = fig.add_subplot(233)
-cmap = cm.get_cmap('OrRd')
+cmap = cm.get_cmap('YlOrRd')
 
 map_data = {}
 for d in populations:
@@ -61,20 +61,9 @@ for d in populations:
 
 show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults")
 
-# {Language} Speakers
-language = 'hindi'
-map_ax = fig.add_subplot(235)
-cmap = cm.get_cmap('GnBu')
-
-map_data = {}
-for d in populations:
-  map_data[d] = languages[d][language] / populations[d]['population']
-
-show_map(map_ax, map_data, cmap, "Districts of India by % with mother tounge " + language)
-
 # Age > {Age Limit}
 age_limit = 60
-map_ax = fig.add_subplot(236)
+map_ax = fig.add_subplot(235)
 cmap = cm.get_cmap('BuGn')
 
 map_data = {}
@@ -87,6 +76,17 @@ for d in populations:
   map_data[d] = age_groups_sum / populations[d]['population']
 
 show_map(map_ax, map_data, cmap, "Districts of India by % population > " + str(age_limit) + " yrs old")
+
+# {Language} Speakers
+language = 'hindi'
+map_ax = fig.add_subplot(236)
+cmap = cm.get_cmap('Wistia')
+
+map_data = {}
+for d in populations:
+  map_data[d] = languages[d][language] / populations[d]['population']
+
+show_map(map_ax, map_data, cmap, "Districts of India by % with mother tounge " + language)
 
 plt.show()
 
