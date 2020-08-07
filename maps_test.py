@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from build_data import get_populations, get_age_groups, get_religions, get_education, get_languages
+from build_data import get_district_info, get_populations, get_age_groups, get_religions, get_education, get_languages
 from draw_districts import show_map
 
 import numpy as np
@@ -9,6 +9,7 @@ import numpy as np
 # Plots
 fig = plt.figure(figsize=(19.2, 10.8), tight_layout=True)
 
+districts = get_district_info()
 populations = get_populations()
 age_groups = get_age_groups()
 religions = get_religions()
@@ -25,15 +26,15 @@ for d in populations:
 
 show_map(map_ax, map_data, cmap, "Districts of India by Literacy Rate")
 
-# 0-5 population
+# Population Density
 map_ax = fig.add_subplot(232)
 cmap = cm.get_cmap('PuBu')
 
 map_data = {}
 for d in populations:
-  map_data[d] = age_groups[d][0]['total'] / populations[d]['population']
+  map_data[d] = populations[d]['population'] / districts[d]['area']
 
-show_map(map_ax, map_data, cmap, "Districts of India by % population < 5 years old")
+show_map(map_ax, map_data, cmap, "Districts of India by Population / sq km", is_percent_data = False)
 
 # {Religion} population
 religion = 'hindu'
@@ -61,21 +62,19 @@ for d in populations:
 
 show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults")
 
-# Age > {Age Limit}
-age_limit = 60
+# Uninhabited Villages
 map_ax = fig.add_subplot(235)
 cmap = cm.get_cmap('BuGn')
 
 map_data = {}
-for d in populations:
-  age_groups_sum = 0
-  for age in age_groups[d]:
-    if age < age_limit:
-      continue
-    age_groups_sum += age_groups[d][age]['total']
-  map_data[d] = age_groups_sum / populations[d]['population']
+for d in districts:
+  total_villages = districts[d]['villages_uninhabited'] + districts[d]['villages_inhabited']
+  if total_villages == 0:
+    map_data[d] = 0
+  else:
+    map_data[d] = districts[d]['villages_uninhabited'] / total_villages
 
-show_map(map_ax, map_data, cmap, "Districts of India by % population > " + str(age_limit) + " yrs old")
+show_map(map_ax, map_data, cmap, "Districts of India by % uninhabited villages")
 
 # {Language} Speakers
 language = 'hindi'

@@ -1,3 +1,32 @@
+def is_any_number(string):
+  parts = string.split('.')
+  for p in parts:
+    if not p.isnumeric():
+      return False
+  return True
+
+def get_district_info():
+  districts = {}
+
+  pop_file = open('data/districts.csv', 'r').readlines()
+  labels = pop_file[0].strip().split(',')
+  for l in pop_file[1:]:
+    parts = l.strip().split(',')
+
+    dist_id = eval(parts[0])
+    districts[dist_id] = {}
+
+    for i, l in enumerate(labels):
+      if i == 0:
+        continue
+      is_number = False
+      if is_any_number(parts[i]):
+        districts[dist_id][l] = eval(parts[i])
+      else:
+        districts[dist_id][l] = parts[i]
+
+  return districts
+
 def get_populations():
   populations = {}
 

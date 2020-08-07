@@ -1,11 +1,12 @@
 from matplotlib import pyplot as plt
-from matplotlib import cm
+from matplotlib import cm, colors
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 from matplotlib.ticker import Formatter, FuncFormatter
 
 from get_basemap import get_basemap_and_district_info
 
+import math
 import numpy as np
 
 def show_map(map_ax, map_data, cmap, title, is_percent_data = True):
@@ -14,7 +15,7 @@ def show_map(map_ax, map_data, cmap, title, is_percent_data = True):
 
   min_val = min(map_data.values())
   max_val = max(map_data.values())
-  norm = plt.Normalize(min_val, max_val)
+  norm = colors.Normalize(vmin = min_val, vmax = max_val)
 
   map_shapes = []
   map_colors = []
