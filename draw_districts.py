@@ -9,13 +9,32 @@ from get_basemap import get_basemap_and_district_info
 import math
 import numpy as np
 
-def show_map(map_ax, map_data, cmap, title, is_percent_data = True):
+VERY_SMALL = 0.0001
+
+def replace_zeroes(data):
+  out_data = {}
+  for d in data:
+    if data[d] > VERY_SMALL:
+      out_data[d] = data[d]
+    else:
+      out_data[d] = VERY_SMALL
+
+  return out_data
+
+def show_map(map_ax, map_data, cmap, title, is_percent_data = True, log_scale = False):
   map_ax.set_title(title)
   _, districts = get_basemap_and_district_info(show_background_map = False)
 
+  map_data = replace_zeroes(map_data)
+
   min_val = min(map_data.values())
   max_val = max(map_data.values())
-  norm = colors.Normalize(vmin = min_val, vmax = max_val)
+  if log_scale:
+    norm = colors.SymLogNorm(vmin = min_val, vmax = max_val, linthresh = VERY_SMALL, base = 10)
+    ticks = np.logspace(math.log(min_val, 10), math.log(max_val, 10), num = 10)
+  else:
+    norm = colors.Normalize(vmin = min_val, vmax = max_val)
+    ticks = np.linspace(min_val, max_val, num = 10)
 
   map_shapes = []
   map_colors = []
@@ -31,6 +50,5 @@ def show_map(map_ax, map_data, cmap, title, is_percent_data = True):
     formatter = FuncFormatter(lambda x, _ : '{val:.2f}'.format(val = x))
   else:
     formatter = FuncFormatter(lambda x, _ : '{percent:.2f} %'.format(percent = 100*x))
-  ticks = np.linspace(min_val, max_val, num = 10)
   plt.colorbar(cm.ScalarMappable(cmap=cmap, norm = norm), ticks = ticks, format = formatter, shrink = 0.9)
 

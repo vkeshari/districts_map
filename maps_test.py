@@ -28,16 +28,16 @@ show_map(map_ax, map_data, cmap, "Districts of India by Literacy Rate")
 
 # Population Density
 map_ax = fig.add_subplot(232)
-cmap = cm.get_cmap('PuBu')
+cmap = cm.get_cmap('pink').reversed()
 
 map_data = {}
 for d in populations:
   map_data[d] = populations[d]['population'] / districts[d]['area']
 
-show_map(map_ax, map_data, cmap, "Districts of India by Population / sq km", is_percent_data = False)
+show_map(map_ax, map_data, cmap, "Districts of India by Population / sq km", is_percent_data = False, log_scale = True)
 
 # {Religion} population
-religion = 'hindu'
+religion = 'muslim'
 map_ax = fig.add_subplot(233)
 cmap = cm.get_cmap('YlOrRd')
 
@@ -45,11 +45,11 @@ map_data = {}
 for d in populations:
   map_data[d] = religions[d][religion] / populations[d]['population']
 
-show_map(map_ax, map_data, cmap, "Districts of India by % " + religion + " population")
+show_map(map_ax, map_data, cmap, "Districts of India by % " + religion + " population", log_scale = True)
 
 # Graduates
 map_ax = fig.add_subplot(234)
-cmap = cm.get_cmap('RdPu')
+cmap = cm.get_cmap('PuBu')
 
 map_data = {}
 for d in populations:
@@ -60,7 +60,7 @@ for d in populations:
     twenty_plus_pop += age_groups[d][age]['total']
   map_data[d] = education[d]['graduate'] / twenty_plus_pop
 
-show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults")
+show_map(map_ax, map_data, cmap, "Districts of India by % Graduate Adults", log_scale = True)
 
 # Uninhabited Villages
 map_ax = fig.add_subplot(235)
@@ -74,18 +74,18 @@ for d in districts:
   else:
     map_data[d] = districts[d]['villages_uninhabited'] / total_villages
 
-show_map(map_ax, map_data, cmap, "Districts of India by % uninhabited villages")
+show_map(map_ax, map_data, cmap, "Districts of India by % uninhabited villages", log_scale = True)
 
 # {Language} Speakers
 language = 'hindi'
 map_ax = fig.add_subplot(236)
-cmap = cm.get_cmap('Wistia')
+cmap = cm.get_cmap('gist_earth').reversed()
 
 map_data = {}
 for d in populations:
   map_data[d] = languages[d][language] / populations[d]['population']
 
-show_map(map_ax, map_data, cmap, "Districts of India by % with mother tounge " + language)
+show_map(map_ax, map_data, cmap, "Districts of India by % with mother tongue " + language, log_scale = True)
 
 plt.show()
 
