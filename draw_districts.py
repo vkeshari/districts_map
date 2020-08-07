@@ -9,15 +9,20 @@ from get_basemap import get_basemap_and_district_info
 import math
 import numpy as np
 
-VERY_SMALL = 0.0001
+def get_small_value(is_percent_data):
+  if is_percent_data:
+    return 0.0001
+  else:
+    return 0.01
 
-def replace_zeroes(data):
+def replace_zeroes(data, small_value):
   out_data = {}
+
   for d in data:
-    if data[d] > VERY_SMALL:
+    if data[d] > small_value:
       out_data[d] = data[d]
     else:
-      out_data[d] = VERY_SMALL
+      out_data[d] = small_value
 
   return out_data
 
@@ -25,12 +30,12 @@ def show_map(map_ax, map_data, cmap, title, is_percent_data = True, log_scale = 
   map_ax.set_title(title)
   _, districts = get_basemap_and_district_info(show_background_map = False)
 
-  map_data = replace_zeroes(map_data)
+  map_data = replace_zeroes(map_data, get_small_value(is_percent_data))
 
   min_val = min(map_data.values())
   max_val = max(map_data.values())
   if log_scale:
-    norm = colors.SymLogNorm(vmin = min_val, vmax = max_val, linthresh = VERY_SMALL, base = 10)
+    norm = colors.SymLogNorm(vmin = min_val, vmax = max_val, linthresh = get_small_value(is_percent_data), base = 10)
     ticks = np.logspace(math.log(min_val, 10), math.log(max_val, 10), num = 10)
   else:
     norm = colors.Normalize(vmin = min_val, vmax = max_val)
