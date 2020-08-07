@@ -3,29 +3,19 @@ import xlrd
 
 from get_basemap import get_basemap_and_district_info
 
-def parse_district_info(districts_info, out_filename):
-  district_info_file = open(out_filename, 'w')
-  district_info_file.write('district_id,' +
-                           'name,state_id,state' + '\n')
-  
-  districts = set()
-  for d in districts_info:
-    dist_id = d['censuscode']
-    if dist_id == 0:
-      continue
-
-    if dist_id not in districts:
-      district_info_file.write(str(dist_id) + ',' +
-                               str(d['DISTRICT']) + ',' + str(d['ST_CEN_CD']) + ',' + str(d['ST_NM']) + '\n')
-    districts.add(dist_id)
-
-  district_info_file.close()
-
 def check_districts_equal(base, built, label):
+  missing_districts = set()
+  extra_districts = set()
   for d in base:
-    assert d in built, label + " has missing district: " + str(d)
+    if d not in built:
+      missing_districts.add(d)
   for d in built:
-    assert d in base, label + " has extra district: " + str(d)
+    if d not in base:
+      extra_districts.add(d)
+
+  print ("Check Districts for " + label)
+  print ("Missing districts: " + str(missing_districts))
+  print ("Extra districts: " + str(extra_districts))
 
 def parse_district_id(raw_string):
     dist_id_string = raw_string.lstrip('0')
@@ -33,8 +23,56 @@ def parse_district_id(raw_string):
       return 0
     return eval(dist_id_string)
 
+def parse_district_info(districts_info, out_filename):
+  districts = {}
+
+  sheet = xlrd.open_workbook('data/raw_data/A-1_NO_OF_VILLAGES_TOWNS_HOUSEHOLDS_POPULATION_AND_AREA.xlsx').sheet_by_index(0)
+
+  for row in range(4, sheet.nrows):
+    if sheet.cell_type(row, 0) == 0:
+      continue
+
+    dist_id = parse_district_id(sheet.cell_value(row, 1))
+    if dist_id == 0:
+      continue
+    if dist_id not in districts:
+      districts[dist_id] = {}
+
+    region_str = sheet.cell_value(row, 3).strip()
+    type_str = sheet.cell_value(row, 5).strip()
+
+    if not region_str == 'DISTRICT' or not type_str == 'Total':
+      continue
+
+    districts[dist_id]['villages_inhabited'] = int(sheet.cell_value(row, 6))
+    districts[dist_id]['villages_uninhabited'] = int(sheet.cell_value(row, 7))
+    districts[dist_id]['towns'] = int(sheet.cell_value(row, 8))
+    districts[dist_id]['area'] = sheet.cell_value(row, 13)
+
+  check_districts_equal([d['censuscode'] for d in districts_info if d['censuscode'] > 0], districts.keys(), 'District data')
+
+  for d in districts_info:
+    dist_id = d['censuscode']
+    if dist_id == 0:
+      continue
+
+    districts[dist_id]['name'] = d['DISTRICT'].strip()
+    districts[dist_id]['state_id'] = d['ST_CEN_CD']
+    districts[dist_id]['state'] = d['ST_NM'].strip()
+
+  district_info_file = open(out_filename, 'w')
+
+  district_info_file.write('district_id,name,state_id,state,area,towns,villages_inhabited,villages_uninhabited' + '\n')
+  for d in sorted(districts.keys()):
+    district_info_file.write(str(d) + ',' + districts[d]['name'] + ',' +
+                             str(districts[d]['state_id']) + ',' + districts[d]['state'] + ',' +
+                             str('{area:.2f}'.format(area = districts[d]['area'])) + ',' + str(districts[d]['towns']) + ',' +
+                             str(districts[d]['villages_inhabited']) + ',' + str(districts[d]['villages_uninhabited']) + '\n')
+  
+  district_info_file.close()
+
 def parse_population_data(district_keys, out_filename):
-  population_raw_file = open('data/raw_data/district_populations.csv', 'r')
+  sheet = xlrd.open_workbook('data/raw_data/DDW_PCA0000_2011_Indiastatedist.xlsx').sheet_by_index(0)
 
   populations_file = open(out_filename, 'w')
   populations_file.write('district_id,' +
@@ -44,24 +82,33 @@ def parse_population_data(district_keys, out_filename):
                          'non_working,non_working_males,non_working_females' + '\n')
 
   all_district_ids = set([])
-  for l in population_raw_file.readlines()[1:]:
-    parts = l.split(',')
-    if not parts[8] == 'Total':
+  for row in range(1, sheet.nrows):
+    dist_id = parse_district_id(sheet.cell_value(row, 1))
+    if dist_id == 0:
+      continue
+    if dist_id not in all_district_ids:
+      all_district_ids.add(dist_id)
+
+    if not sheet.cell_value(row, 8) == 'Total':
       continue
 
-    dist_id = parse_district_id(parts[1])
-    all_district_ids.add(dist_id)
-
     populations_file.write(str(dist_id) + ',' +
-                           parts[10].strip() + ',' +  parts[11].strip() + ',' +  parts[12].strip() + ',' +
-                           parts[22].strip() + ',' +  parts[23].strip() + ',' +  parts[24].strip() + ',' +
-                           parts[28].strip() + ',' +  parts[29].strip() + ',' +  parts[30].strip() + ',' +
-                           parts[-3].strip() + ',' +  parts[-2].strip() + ',' +  parts[-1].strip() + '\n')
-
-  population_raw_file.close()
-  populations_file.close()
+                           str(int(sheet.cell_value(row, 10))) + ',' +
+                           str(int(sheet.cell_value(row, 11))) + ',' +
+                           str(int(sheet.cell_value(row, 12))) + ',' +
+                           str(int(sheet.cell_value(row, 22))) + ',' +
+                           str(int(sheet.cell_value(row, 23))) + ',' +
+                           str(int(sheet.cell_value(row, 24))) + ',' +
+                           str(int(sheet.cell_value(row, 28))) + ',' +
+                           str(int(sheet.cell_value(row, 29))) + ',' +
+                           str(int(sheet.cell_value(row, 30))) + ',' +
+                           str(int(sheet.cell_value(row, -3))) + ',' +
+                           str(int(sheet.cell_value(row, -2))) + ',' +
+                           str(int(sheet.cell_value(row, -1))) + '\n')
 
   check_districts_equal(district_keys, all_district_ids, 'populations')
+
+  populations_file.close()
 
 def parse_age_data(district_keys, out_filename):
   age_data = {}
