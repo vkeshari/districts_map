@@ -270,6 +270,10 @@ def parse_language_data(district_keys, out_filename):
         continue
       if dist_id not in languages:
         languages[dist_id] = {}
+
+      sub_dist_id = parse_district_id(sheet.cell_value(row, 3))
+      if not sub_dist_id == 0:
+        continue
       
       language_str = sheet.cell_value(row, 6)
       parts = language_str.strip().split(' ')
@@ -293,7 +297,7 @@ def parse_language_data(district_keys, out_filename):
     dist_line = str(d) + ','
     for l in sorted(all_languages):
       if l in languages[d]:
-        dist_line += str(int(languages[d][l]/2)) + ','
+        dist_line += str(int(languages[d][l])) + ','
       else:
         dist_line += '0,'
     languages_file.write(dist_line[:-1] + '\n')
