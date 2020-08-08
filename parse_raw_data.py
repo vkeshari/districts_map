@@ -277,7 +277,7 @@ def parse_language_data(district_keys, out_filename):
       
       language_str = sheet.cell_value(row, 6)
       parts = language_str.strip().split(' ')
-      if not len(parts) == 2 or not parts[0].isnumeric() or not parts[1].isalpha() or parts[1] == 'Others':
+      if len(parts) < 2 or not parts[0].isnumeric() or parts[1] == 'Others':
         continue
 
       lang = parts[1].lower().split('/')[0].strip()
