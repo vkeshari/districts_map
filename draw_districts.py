@@ -15,6 +15,18 @@ def get_small_value(is_percent_data):
   else:
     return 0.01
 
+def get_text_size(big_text):
+  if big_text:
+    return 15
+  else:
+    return 10
+
+def get_shrink_factor(big_text):
+  if big_text:
+    return 0.8
+  else:
+    return 0.9
+
 def replace_zeroes(data, small_value):
   out_data = {}
 
@@ -26,8 +38,9 @@ def replace_zeroes(data, small_value):
 
   return out_data
 
-def show_map(map_ax, map_data, cmap, title, is_percent_data = True, log_scale = False):
-  map_ax.set_title(title)
+def show_map(map_ax, map_data, cmap, title, is_percent_data = True, log_scale = False, big_text = False):
+  map_ax.set_title(title, fontsize = get_text_size(big_text))
+
   _, districts = get_basemap_and_district_info(show_background_map = False)
 
   map_data = replace_zeroes(map_data, get_small_value(is_percent_data))
@@ -55,5 +68,11 @@ def show_map(map_ax, map_data, cmap, title, is_percent_data = True, log_scale = 
     formatter = FuncFormatter(lambda x, _ : '{val:.2f}'.format(val = x))
   else:
     formatter = FuncFormatter(lambda x, _ : '{percent:.2f} %'.format(percent = 100*x))
-  plt.colorbar(cm.ScalarMappable(cmap=cmap, norm = norm), ticks = ticks, format = formatter, shrink = 0.9)
+  cbar = plt.colorbar(cm.ScalarMappable(cmap=cmap, norm = norm), ticks = ticks, format = formatter, fraction = 0.1, shrink = get_shrink_factor(big_text))
+  cbar.ax.tick_params(labelsize = get_text_size(big_text))
+  if log_scale:
+    colorbar_title = 'Log Scale'
+  else:
+    colorbar_title = 'Scale'
+  cbar.ax.set_title(colorbar_title, fontsize = get_text_size(big_text), pad = 20.0) 
 

@@ -21,7 +21,7 @@ map_ax = fig.add_subplot(231)
 cmap = cm.get_cmap('YlGn')
 
 map_data = {}
-for d in populations:
+for d in districts:
   map_data[d] = populations[d]['literates'] / populations[d]['population']
 
 show_map(map_ax, map_data, cmap, "Districts of India by Literacy Rate")
@@ -31,7 +31,7 @@ map_ax = fig.add_subplot(232)
 cmap = cm.get_cmap('pink').reversed()
 
 map_data = {}
-for d in populations:
+for d in districts:
   map_data[d] = populations[d]['population'] / districts[d]['area']
 
 show_map(map_ax, map_data, cmap, "Districts of India by Population / sq km", is_percent_data = False, log_scale = True)
@@ -42,7 +42,7 @@ map_ax = fig.add_subplot(233)
 cmap = cm.get_cmap('YlOrRd')
 
 map_data = {}
-for d in populations:
+for d in districts:
   map_data[d] = religions[d][religion] / populations[d]['population']
 
 show_map(map_ax, map_data, cmap, "Districts of India by % " + religion + " population", log_scale = True)
@@ -52,7 +52,7 @@ map_ax = fig.add_subplot(234)
 cmap = cm.get_cmap('PuBu')
 
 map_data = {}
-for d in populations:
+for d in districts:
   twenty_plus_pop = 0
   for age in age_groups[d]:
     if age < 20:
@@ -82,7 +82,7 @@ map_ax = fig.add_subplot(236)
 cmap = cm.get_cmap('gist_earth').reversed()
 
 map_data = {}
-for d in populations:
+for d in districts:
   map_data[d] = languages[d][language] / populations[d]['population']
 
 show_map(map_ax, map_data, cmap, "Districts of India by % with mother tongue " + language, log_scale = True)
