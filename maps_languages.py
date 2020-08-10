@@ -3,6 +3,7 @@ from matplotlib import cm
 
 from build_data import get_district_info, get_populations, get_languages
 from draw_districts import show_map
+from draw_chart import show_chart
 
 def map_languages(log_scale):
   all_languages = languages[1].keys()
@@ -54,6 +55,25 @@ def map_popular_languages():
   plt.close(fig)
   print (file_name)
 
+def chart_popular_languages():
+  popular_languages = {}
+  for l in languages[1]:
+    popular_languages[l] = 0
+
+  for d in districts:
+    for l in languages[d]:
+      popular_languages[l] += languages[d][l]
+
+  fig = plt.figure(figsize=(10.8, 10.8), tight_layout=True)
+  chart_ax = fig.add_subplot(111)
+  cmap = cm.get_cmap('nipy_spectral')
+
+  chart_data = popular_languages
+  max_bars = 20
+  show_chart(chart_ax, chart_data, max_bars, cmap, "Most spoken languages", big_text = True)
+
+  plt.show()
+
 districts = get_district_info()
 populations = get_populations()
 languages = get_languages()
@@ -62,5 +82,7 @@ languages = get_languages()
 # map_languages(log_scale = False)
 # map_languages(log_scale = True)
 
-map_popular_languages()
+#map_popular_languages()
+
+chart_popular_languages()
 
